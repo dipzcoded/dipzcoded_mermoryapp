@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import path from "path";
 import { config as dotenv } from "dotenv";
 
 dotenv();
@@ -14,15 +15,20 @@ app.use(express.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 app.use("/api/posts", postRouter);
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello to Memory API");
-});
-
 const PORT = process.env.PORT || 5000;
 const DB_URL = process.env.CONNECTION_URL!.replace(
   "PASSWORD",
   process.env.DB_PASSWORD as string
 );
+
+// serve static assets
+if (process.env.NODE_ENV === "production") {
+  // set static folder
+  app.use(express.static("client/build"));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
 
 // making connection to our database
 mongoose
