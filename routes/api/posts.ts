@@ -8,15 +8,18 @@ import {
   deletePostById,
   likePostOfId,
 } from "../../controllers/posts";
+// middleware
+import auth from "../../middleware/auth";
 
 const router: Router = express.Router();
 
-router.route("/").get(getPosts).post(createPost);
+router.route("/").get(getPosts).post(auth, createPost);
 router
   .route("/:id")
   .get(getPostById)
-  .patch(updatePostById)
-  .delete(deletePostById);
-router.route("/:id/likepost").patch(likePostOfId);
+  .patch(auth, updatePostById)
+  .delete(auth, deletePostById);
+
+router.route("/:id/likepost").patch(auth, likePostOfId);
 
 export default router;
