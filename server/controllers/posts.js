@@ -1,11 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import PostModel, { postObject } from "../models/Post";
+const PostModel = require("../models/Post");
 
-export const getPosts = async (
-  req: Request | any,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+exports.getPosts = async (req, res, next) => {
   try {
     const data = await PostModel.find();
     res.status(200).json(data);
@@ -14,11 +9,7 @@ export const getPosts = async (
   }
 };
 
-export const getPostById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<any> => {
+exports.getPostById = async (req, res, next) => {
   const id = req.params.id;
   try {
     const post = await PostModel.findById(id);
@@ -32,13 +23,9 @@ export const getPostById = async (
   }
 };
 
-export const createPost = async (
-  req: Request | any,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+exports.createPost = async (req, res, next) => {
   try {
-    let newPost = new PostModel({ ...req.body, creator: req!.userId });
+    let newPost = new PostModel({ ...req.body, creator: req.userId });
     await newPost.save();
     res.status(201).json(newPost);
   } catch (error) {
@@ -47,15 +34,11 @@ export const createPost = async (
   }
 };
 
-export const updatePostById = async (
-  req: Request | any,
-  res: Response,
-  next: NextFunction
-): Promise<any> => {
+exports.updatePostById = async (req, res, next) => {
   const id = req.params.id;
 
   try {
-    const userPost = await PostModel.find({ creator: req!.userId });
+    const userPost = await PostModel.find({ creator: req.userId });
     const index = userPost.findIndex((el) => el._id === id.toString());
     if (index !== -1) {
       return res
@@ -78,16 +61,12 @@ export const updatePostById = async (
   }
 };
 
-export const deletePostById = async (
-  req: Request | any,
-  res: Response,
-  next: NextFunction
-): Promise<any> => {
+exports.deletePostById = async (req, res, next) => {
   const id = req.params.id;
   console.log(id);
-  console.log(req!.userId);
+  console.log(req.userId);
   try {
-    const userPost = await PostModel.find({ creator: req!.userId });
+    const userPost = await PostModel.find({ creator: req.userId });
 
     const index = userPost.findIndex((el) => el._id === id.toString());
     console.log(index);
@@ -107,25 +86,22 @@ export const deletePostById = async (
   }
 };
 
-export const likePostOfId = async (
-  req: Request | any,
-  res: Response,
-  next: NextFunction
-): Promise<any> => {
+exports.likePostOfId = async (req, res, next) => {
   const id = req.params.id;
   try {
-    let post = await PostModel.findById(id);
-    const index = post!.likeCount.findIndex(
-      (el) => el === req!.userId.toString()
+    const post = await PostModel.findById(id);
+    const index = post.likeCount.findIndex(
+      (el) => el === req.userId.toString()
     );
     if (index === -1) {
-      post!.likeCount!.push(req.userId);
+      post.likeCount.push(req.userId);
     } else {
-      post!.likeCount = post!.likeCount.filter(
-        (el) => el.toString() !== req!.userId.toString()
+      post.likeCount = post.likeCount.filter(
+        (el) => el.toString() !== req.userId.toString()
       );
     }
-    await post!.save();
+
+    await post.save();
     res.status(200).json(post);
   } catch (error) {
     if (error.kind === "ObjectId") {

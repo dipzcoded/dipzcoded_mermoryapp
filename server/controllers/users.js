@@ -1,9 +1,8 @@
-import { Request, Response, NextFunction } from "express";
-import bcryptjs from "bcryptjs";
-import jwt from "jsonwebtoken";
-import UserModel, { userObject } from "../models/User";
+const bcryptjs = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const UserModel = require("../models/User");
 
-const tokenInit = (user: any, res: Response): any => {
+const tokenInit = (user, res) => {
   const payload = {
     user: {
       id: user.email,
@@ -19,11 +18,7 @@ const tokenInit = (user: any, res: Response): any => {
   res.status(200).json({ result: user, token });
 };
 
-export const signUp = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<any> => {
+exports.signUp = async (req, res, next) => {
   const { firstName, lastName, email, password, confirmPassword } = req.body;
   try {
     const existingUser = await UserModel.findOne({ email });
@@ -46,21 +41,14 @@ export const signUp = async (
   }
 };
 
-export const signIn = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<any> => {
+exports.signIn = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const existingUser = await UserModel.findOne({ email });
     if (!existingUser) {
       return res.status(404).json({ msg: "Invalid credentials" });
     }
-    const isMatch: boolean = await bcryptjs.compare(
-      password,
-      existingUser.password
-    );
+    const isMatch = await bcryptjs.compare(password, existingUser.password);
     if (!isMatch) {
       return res.status(400).json({ msg: "Invalid credentials" });
     }

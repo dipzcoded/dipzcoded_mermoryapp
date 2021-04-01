@@ -1,17 +1,17 @@
-import express, { Router } from "express";
+const express = require("express");
 // controllers
-import {
+const {
   getPosts,
   createPost,
   updatePostById,
   getPostById,
   deletePostById,
   likePostOfId,
-} from "../../controllers/posts";
+} = require("../../controllers/posts");
 // middleware
-import auth from "../../middleware/auth";
+const auth = require("../../middleware/auth");
 
-const router: Router = express.Router();
+const router = express.Router();
 
 router.route("/").get(getPosts).post(auth, createPost);
 router
@@ -22,4 +22,4 @@ router
 
 router.route("/:id/likepost").patch(auth, likePostOfId);
 
-export default router;
+module.exports = router;
